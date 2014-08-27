@@ -1,0 +1,7 @@
+"showdown"
+{
+	"base"		"base"
+	"title"		"Showdown"
+	"maps"		"^sd"
+	"menusystem"	"1"
+}

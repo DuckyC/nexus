@@ -1,3 +1,5 @@
+Check out the [Trello board](https://trello.com/b/qRGtTTHM/event-gamemode) if you want to contribute.
+
 A huge big ass map where users dick around, drive/race/dm/rp/whatever
 Players create events (climb,race,FFA dm,team dm,whatever) where people join using a menu or get to the event location
 events happen at the same server and map, but different layer where other players (other events/main world) are not visible or collide and event objects cannot be seen between layers (checkpoints, entities, whatever)

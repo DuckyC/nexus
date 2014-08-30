@@ -1,0 +1,7 @@
+"nexus"
+{
+	"base"		"base"
+	"title"		"Nexus"
+	"maps"		"^nx_"
+	"menusystem"	"1"
+}

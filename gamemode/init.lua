@@ -1,7 +1,15 @@
---[[---------------------------------------------------------
+AddCSLuaFile( "cl_init.lua" )
+AddCSLuaFile( "shared.lua" )
+AddCSLuaFile( "sh_dimensions.lua" )
 
-  Showdown Gamemode
+include( 'shared.lua' )
 
-  This is a project by gmodcoders
 
------------------------------------------------------------]]
+function Chunk_Test(ply)
+	if(ply:GetDimension() == 0) then
+		ply:SetDimension(1)
+	else
+		ply:SetDimension(0)
+	end
+end
+concommand.Add("Chunk_Test",Chunk_Test)

@@ -46,14 +46,11 @@ if SERVER then
 			end
 		end
 	end
-
-	hook.Add("PlayerInitialSpawn", "nx_dimensions", function(ply) ply:SetDimension(0) end)
 	
 	function GM:CanPlayerUnfreeze( ent1, ent2 ) return ent1:ShouldInteract(ent2) end
 	function GM:PlayerCanPickupItem( ent1, ent2 ) return ent1:ShouldInteract(ent2) end
 	function GM:PlayerCanPickupWeapon( ent1, ent2 ) return ent1:ShouldInteract(ent2) end
 	function GM:AllowPlayerPickup( ent1, ent2 ) return ent1:ShouldInteract(ent2) end
-
 	function GM:EntityTakeDamage( target, dmginfo ) 
 		if !target:ShouldInteract(dmginfo:GetInflictor()) then
 			dmginfo:SetDamageForce(Vector(0,0,0))
@@ -68,7 +65,6 @@ else
 	local function SetDrawAndShadow(ent)
 		if IsValid(ent) and !ent:IsPlayer() and ent:GetClass() != "viewmodel" then
 			local bool = lp:ShouldInteract(ent)
-			print(bool,ent)
 			ent:DrawShadow(bool)
 			ent:SetNoDraw(!bool)
 		end
@@ -79,15 +75,13 @@ else
 			end
 		end
 	end
-	function HandleEntity(ent, dimension)
+	local function HandleEntity(ent, dimension)
 		ent.dimension = dimension
 		SetDrawAndShadow(ent)
 		if ent:IsPlayer() then
-			if ent:IsPlayer() then 
-				for k,v in pairs(ent:GetWeapons()) do
-					v.dimension = dimension or 0
-					SetDrawAndShadow(v)
-				end
+			for k,v in pairs(ent:GetWeapons()) do
+				v.dimension = dimension or 0
+				SetDrawAndShadow(v)
 			end
 		end
 	end
@@ -126,5 +120,4 @@ function GM:PlayerCanHearPlayersVoice( ent1, ent2 ) return ent1:ShouldInteract(e
 function GM:PlayerShouldTakeDamage( ent1, ent2 ) return ent1:ShouldInteract(ent2)  end
 function GM:PhysgunPickup( ent1, ent2 ) return ent1:ShouldInteract(ent2)  end
 function GM:GravGunPunt( ent1, ent2 ) return ent1:ShouldInteract(ent2)  end
-function GM:OnEntityCreated(ent) ent:SetCustomCollisionCheck(true) if SERVER then ent:SetDimension(0) end end
-
+function GM:OnEntityCreated(ent) ent:SetCustomCollisionCheck(true) end

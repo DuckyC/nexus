@@ -2,7 +2,7 @@ GM.Name 	= "Nexus"
 GM.Author 	= "GModCoders"
 GM.Email 	= "N/A"
 GM.Website 	= "glua.me"
-GM.Path 	= "gamemodes/"..GM.FolderPath.."/gamemode"
+GM.Path 	= "gamemodes/nexus/gamemode"
 
 DeriveGamemode("sandbox")
 

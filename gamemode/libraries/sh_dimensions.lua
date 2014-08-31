@@ -68,6 +68,7 @@ else
 	local function SetDrawAndShadow(ent)
 		if IsValid(ent) and !ent:IsPlayer() and ent:GetClass() != "viewmodel" then
 			local bool = lp:ShouldInteract(ent)
+			print(bool,ent)
 			ent:DrawShadow(bool)
 			ent:SetNoDraw(!bool)
 		end
@@ -78,7 +79,7 @@ else
 			end
 		end
 	end
-	local function HandleEntity(ent, dimension)
+	function HandleEntity(ent, dimension)
 		ent.dimension = dimension
 		SetDrawAndShadow(ent)
 		if ent:IsPlayer() then
@@ -125,6 +126,5 @@ function GM:PlayerCanHearPlayersVoice( ent1, ent2 ) return ent1:ShouldInteract(e
 function GM:PlayerShouldTakeDamage( ent1, ent2 ) return ent1:ShouldInteract(ent2)  end
 function GM:PhysgunPickup( ent1, ent2 ) return ent1:ShouldInteract(ent2)  end
 function GM:GravGunPunt( ent1, ent2 ) return ent1:ShouldInteract(ent2)  end
-
-hook.Add("OnEntityCreated", "nx_dimensions", function(ent) ent:SetCustomCollisionCheck(true) end)
+function GM:OnEntityCreated(ent) ent:SetCustomCollisionCheck(true) if SERVER then ent:SetDimension(0) end end
 

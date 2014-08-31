@@ -8,6 +8,9 @@ DeriveGamemode("sandbox")
 
 nexus = {}
 
+if SERVER then
+	AddCSLuaFile('libraries/loader.lua')
+end
 include('libraries/loader.lua')
 
 function GM:Initialize()

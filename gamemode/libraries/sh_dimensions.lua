@@ -126,5 +126,5 @@ function GM:PlayerCanHearPlayersVoice( ent1, ent2 ) return ent1:ShouldInteract(e
 function GM:PlayerShouldTakeDamage( ent1, ent2 ) return ent1:ShouldInteract(ent2)  end
 function GM:PhysgunPickup( ent1, ent2 ) return ent1:ShouldInteract(ent2)  end
 function GM:GravGunPunt( ent1, ent2 ) return ent1:ShouldInteract(ent2)  end
-function GM:OnEntityCreated(ent) ent:SetCustomCollisionCheck(true) if SERVER then ent:SetDimension(0) end end
+function GM:OnEntityCreated(ent) ent:SetCustomCollisionCheck(true) end
 

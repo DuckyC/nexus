@@ -1,6 +1,7 @@
 local path = (GM and GM.Path) or GAMEMODE.Path
 
 function nexus.load()
+	print("Loading libraries")
 	for _, x in pairs(file.Find(path..'/libraries/*','GAME')) do
 		local realm = x:sub(1,2)
 		local relPath = GM.FolderName..'/gamemode/libraries/'..x

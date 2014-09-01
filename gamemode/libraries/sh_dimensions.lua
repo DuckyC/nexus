@@ -11,15 +11,13 @@ function ENTITY:GetDimension()
 	return nexus.dimensions[self:EntIndex()] or 0
 end
 
-function ENTITY:ShouldInteract(ent)
+function ENTITY:ShouldInteract(ent, debugprint)
 	if self == ent then return true end
 	local dim1 = self.GetDimension and self:GetDimension() or 0
 	local dim2 = ent.GetDimension and ent:GetDimension() or 0
-	if(dim1 == -1 or dim2 == -1 or (dim1 == dim2))then
-		return true
-	else 
-		return false
-	end
+	local bool = (dim1 == -1 or dim2 == -1 or (dim1 == dim2))
+	if debugprint then print(self, dim1, ent, dim2, bool) end
+	return bool
 end
 
 if SERVER then
@@ -52,30 +50,18 @@ if SERVER then
 			end
 		end
 	end	
+
+
+	concommand.Add("dimension_setme",function(ply, _, args) if tonumber(args[1]) and IsValid(ply) then ply:SetDimension(tonumber(args[1])) end end)
+	concommand.Add("dimension_setthis",function(ply, _, args) 
+		if tonumber(args[1]) and IsValid(ply) then 
+			local trace = ply:GetEyeTrace()
+			if IsValid(trace.Entity) then
+				trace.Entity:SetDimension(tonumber(args[1])) 
+			end
+		end 
+	end)
 else
-	local LPly = LocalPlayer()
-
-	local function SetDrawAndShadow(Ent)
-		/*if IsValid(Ent) and !Ent:IsPlayer() and Ent:GetClass() != "viewmodel" then
-			local bool = LPly:ShouldInteract(Ent)
-			Ent:DrawShadow(bool)
-			Ent:SetNoDraw(!bool)
-			print(Ent, bool)
-		end
-		if Ent == LPly then
-			for _,AEnt in pairs(ents.GetAll()) do
-				if AEnt == LPly or AEnt == game.GetWorld() then continue end
-				SetDrawAndShadow(v)
-			end
-		end
-		if IsValid(Ent) and Ent:IsPlayer() then
-			for _,Wep in pairs(Ent:GetWeapons()) do
-				nexus.dimensions[Wep:EntIndex()] = dimension or 0
-				SetDrawAndShadow(Wep)
-			end
-		end*/
-	end
-
 	local function HandleEntity(id, dimension)
 		if type(id) == "table" then
 			for nid,dimension in pairs(id) do
@@ -83,11 +69,6 @@ else
 			end
 		end
 		nexus.dimensions[id] = dimension or 0
-		print("Starting timer")
-		timer.Simple(1, function()
-			print(Entity(id), id)
-			SetDrawAndShadow(Entity(id))
-		end)
 	end
 
 	net.Receive("nx_dimension", function()
@@ -113,17 +94,25 @@ end
 
 
 if SERVER then
-	function GM:CanPlayerUnfreeze( ent1, ent2 ) return ent1:ShouldInteract(ent2) end
-	function GM:PlayerCanPickupItem( ent1, ent2 ) return ent1:ShouldInteract(ent2) end
-	function GM:PlayerCanPickupWeapon( ent1, ent2 ) return ent1:ShouldInteract(ent2) end
-	function GM:AllowPlayerPickup( ent1, ent2 ) return ent1:ShouldInteract(ent2) end
-	function GM:EntityTakeDamage( target, dmginfo ) 
+	-- spawning
+	hook.Add("PlayerSpawnedVehicle"	, "nx_dimensions", function(ply  , ent) ent:SetDimension(ply:GetDimension()) end)
+	hook.Add("PlayerSpawnedSWEP"	, "nx_dimensions", function(ply  , ent) ent:SetDimension(ply:GetDimension()) end)
+	hook.Add("PlayerSpawnedSENT"	, "nx_dimensions", function(ply  , ent) ent:SetDimension(ply:GetDimension()) end)
+	hook.Add("PlayerSpawnedRagdoll"	, "nx_dimensions", function(ply,_, ent) ent:SetDimension(ply:GetDimension()) end)
+	hook.Add("PlayerSpawnedProp"	, "nx_dimensions", function(ply,_, ent) ent:SetDimension(ply:GetDimension()) end)
+
+	-- player allow
+	hook.Add("CanPlayerUnfreeze"	, "nx_dimensions", function(ent1, ent2) if !ent1:ShouldInteract(ent2) then return false end end)
+	hook.Add("PlayerCanPickupItem"	, "nx_dimensions", function(ent1, ent2) if !ent1:ShouldInteract(ent2) then return false end end)
+	hook.Add("PlayerCanPickupWeapon", "nx_dimensions", function(ent1, ent2) if !ent1:ShouldInteract(ent2) then return false end end)
+	hook.Add("AllowPlayerPickup"	, "nx_dimensions", function(ent1, ent2) if !ent1:ShouldInteract(ent2) then return false end end)
+	hook.Add("AllowPlayerPickup"	, "nx_dimensions", function( target, dmginfo ) 
 		if !target:ShouldInteract(dmginfo:GetInflictor()) then
 			dmginfo:SetDamageForce(Vector(0,0,0))
 			dmginfo:SetDamage(0)
+			return dmginfo
 		end
-		return dmginfo
-	end
+	end)
 else
 	local IgnoreClasses = {"viewmodel", "physgun_beam", "beam"}
 	local function IsIgnored(Ent) 
@@ -136,15 +125,9 @@ else
 	end
 
 	local LPly = LocalPlayer()
-	function GM:PrePlayerDraw( ply2 )
-		return !LPly:ShouldInteract(ply2)
-	end
-	function GM:PlayerFootstep(  ply2 )
-		return !LPly:ShouldInteract(ply2)
-	end
-	function GM:DrawPhysgunBeam( ply2)
-		return LPly:ShouldInteract(ply2)
-	end
+	hook.Add("PrePlayerDraw"	, "nx_dimensions", function(ply2) return !LPly:ShouldInteract(ply2) end)
+	hook.Add("PlayerFootstep"	, "nx_dimensions", function(ply2) return !LPly:ShouldInteract(ply2) end)
+	hook.Add("DrawPhysgunBeam"	, "nx_dimensions", function(ply2) return LPly:ShouldInteract(ply2) end)
 	hook.Add("PreDrawHUD", "nx_dimensions", function()
 		local AllEntities = ents.GetAll()
 		for i=1, #AllEntities do
@@ -159,17 +142,15 @@ else
 		end
 	end)
 end
-function GM:ShouldCollide( ent1, ent2 ) sukmudik() return ent1:ShouldInteract(ent2) end
-function GM:CanPlayerEnterVehicle( ent1, ent2 ) return ent1:ShouldInteract(ent2)  end
-function GM:GravGunPickupAllowed( ent1, ent2 ) return ent1:ShouldInteract(ent2)  end
-function GM:PlayerCanHearPlayersVoice( ent1, ent2 ) return ent1:ShouldInteract(ent2)  end
-function GM:PlayerShouldTakeDamage( ent1, ent2 ) return ent1:ShouldInteract(ent2)  end
-function GM:PhysgunPickup( ent1, ent2 ) return ent1:ShouldInteract(ent2)  end
-function GM:GravGunPunt( ent1, ent2 ) return ent1:ShouldInteract(ent2)  end
+hook.Add("CanPlayerEnterVehicle"	, "nx_dimensions", function(ent1, ent2) if !ent1:ShouldInteract(ent2) then return false end end)
+hook.Add("PlayerCanHearPlayersVoice", "nx_dimensions", function(ent1, ent2) if !ent1:ShouldInteract(ent2) then return false end end)
+hook.Add("PlayerShouldTakeDamage"	, "nx_dimensions", function(ent1, ent2) if !ent1:ShouldInteract(ent2) then return false end end)
+hook.Add("PhysgunPickup"			, "nx_dimensions", function(ent1, ent2) if !ent1:ShouldInteract(ent2) then return false end end)
+hook.Add("GravGunPunt"				, "nx_dimensions", function(ent1, ent2) if !ent1:ShouldInteract(ent2) then return false end end)
+hook.Add("ShouldCollide"			, "nx_dimensions", function(ent1, ent2) if !ent1:ShouldInteract(ent2) then return false end end)
 
-hook.Add("ShouldCollide", "nx_dimensions", function( ent1, ent2 ) sukmudik() return ent1:ShouldInteract(ent2) end)
-
-hook.Add("OnEntityCreated", "nx_dimensions", function(ent)
-	timer.Simple(1, function() if IsValid(ent) then print(ent, "collpls") ent:EnableCustomCollisions(true) end end)
-	if SERVER then ent:SetDimension(0) end
+hook.Add("OnEntityCreated"			, "nx_dimensions", function(ent)
+	ent:EnableCustomCollisions(true)
+	local id = ent:EntIndex()
+	nexus.dimensions[id] = nexus.dimensions[id] or -1
 end)

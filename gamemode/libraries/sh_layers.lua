@@ -70,7 +70,7 @@ else
 			end
 			return
 		end
-		local phys = self:GetPhysicsObject()
+
 		if self:getLayer() ~= lp:getLayer() then
 			self:SetNoDraw(true)
 			self:DrawShadow(false)

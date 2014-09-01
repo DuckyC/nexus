@@ -6,10 +6,6 @@ layer = {}
 layer.__index = layer
 layers = {}
 
-if CLIENT then
-	layer.pending = {}
-end
-
 function layer.new()
 	local t = {info = {}}
 	setmetatable(t,layer.index)
@@ -44,7 +40,6 @@ if CLIENT then
 		local layer = net.ReadUInt(8)
 		local ent = Entity(index)
 		if !IsValid(ent) then
-			layer.pending[index] = true
 			return
 		end
 		ent.layer = layer

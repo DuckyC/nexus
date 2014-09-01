@@ -43,7 +43,7 @@ if CLIENT then
 			return
 		end
 		ent.layer = layer
-		ent:handle()
+		ent:handleLayring()
 	end)
 end
 --META--
@@ -60,13 +60,13 @@ if SERVER then
 	end
 
 else
-	function ENT:handle()
+	function ENT:handleLayring()
 		if !self:shouldLayer() then return end
 		local lp = LocalPlayer()
 		if self == lp then
 			for _, x in pairs(ents.GetAll()) do
 				if x == lp then continue end
-				x:handle()
+				x:handleLayring()
 			end
 			return
 		end
@@ -104,6 +104,6 @@ function GM:OnEntityCreated(ent)
 	if SERVER then
 		ent:setLayer(LAYER_MAIN)
 	else
-		ent:handle()
+		ent:handleLayring()
 	end
 end

@@ -1,6 +1,5 @@
 local path = (GM and GM.Path) or GAMEMODE.Path
 events = {}
-print(events)
 
 local EV_META = {}
 EV_META.__index = EV_META
@@ -43,7 +42,6 @@ function events.loadEvent(name)
 
 	if file.Exists( searchpath, "GAME" ) and file.IsDir(searchpath, "GAME") then
 		EVENT = setmetatable({},EV_META)
-		EVENT.ID = #events+1
 		
 		if file.Exists( searchpath.."/cl_init.lua", "GAME" ) then
 			if SERVER then 
@@ -61,7 +59,6 @@ function events.loadEvent(name)
 
 	if file.Exists( searchpath..".lua", "GAME" ) then
 		EVENT = setmetatable({},EV_META)
-		EVENT.ID = #events+1
 		
 		if SERVER then AddCSLuaFile(includepath..".lua") end
 		include(includepath..".lua")

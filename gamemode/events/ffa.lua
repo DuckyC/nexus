@@ -1,11 +1,11 @@
-local event = event.new()
+EVENT.Name = "Free for all"
+EVENT.ID = "FFA"
 
-event:addHook('PlayerDeath',function(ply)
+function EVENT:PlayerDeath(ply)
+	if not ply:inEvent(self.ID) then return end
 	print('I DIED IN FFA')
-end)
-
-event:addHook('PlayerSpawn',function(ply)
+end
+function EVENT:PlayerSpawn(ply)
+	if not ply:inEvent(self.ID) then return end
 	print('I SPAWNED IN FFA')
-end)
-
-event:register(TYPE_FFA)
+end

@@ -19,3 +19,4 @@ function nexus.load()
 end
 
 nexus.load()
+event.load()

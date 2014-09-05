@@ -17,7 +17,7 @@ USE `nexus`;
 
 -- Dumping structure for function nexus.64toID
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` FUNCTION `64toID`() RETURNS varchar(20) CHARSET latin1
+CREATE DEFINER=`root`@`localhost` FUNCTION `64toID`(`SteamID64` BIGINT) RETURNS varchar(20) CHARSET latin1
     NO SQL
 BEGIN
 	DECLARE parta TINYINT;
@@ -31,7 +31,7 @@ DELIMITER ;
 
 -- Dumping structure for function nexus.IDto64
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` FUNCTION `IDto64`() RETURNS bigint(20)
+CREATE DEFINER=`root`@`localhost` FUNCTION `IDto64`(`SteamID` VARCHAR(20)) RETURNS bigint(20)
     NO SQL
 BEGIN
 	DECLARE parta TINYINT;
@@ -63,9 +63,10 @@ DELETE FROM `nx_bans`;
 -- Dumping structure for table nexus.nx_users
 CREATE TABLE IF NOT EXISTS `nx_users` (
   `steamid` bigint(20) unsigned NOT NULL,
-  `rank` tinyint(4) unsigned DEFAULT NULL,
-  `nickname` varchar(50) NOT NULL,
+  `rank` tinyint(4) unsigned NOT NULL DEFAULT '1',
+  `name` varchar(50) NOT NULL DEFAULT 'None',
   `timeplayed` time NOT NULL DEFAULT '00:00:00',
+  `lastseen` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`steamid`),
   UNIQUE KEY `steamid_UNIQUE` (`steamid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -73,6 +74,8 @@ CREATE TABLE IF NOT EXISTS `nx_users` (
 -- Dumping data for table nexus.nx_users: ~0 rows (approximately)
 DELETE FROM `nx_users`;
 /*!40000 ALTER TABLE `nx_users` DISABLE KEYS */;
+INSERT INTO `nx_users` (`steamid`, `rank`, `name`, `timeplayed`, `lastseen`) VALUES
+	(76561198027099859, 1, 'Ducky', '00:00:00', '2014-09-05 19:46:34');
 /*!40000 ALTER TABLE `nx_users` ENABLE KEYS */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
